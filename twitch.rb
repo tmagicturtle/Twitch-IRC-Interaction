@@ -13,6 +13,7 @@
 #  * Will refund half the value of their next redemption if coupon is active (Revlo)
 #  * Whispers Jackbox roomcode (or other information) upon redeeming a specific Revlo reward
 #  * Responds to !vikavolt
+#  * Upon redemption of Pay Day, generates a random number between 1 and 15 and grants points to all (Revlo)
 #
 # Installation:
 #  As a Ruby script, this requires Ruby to be installed on the user's machine.
@@ -82,6 +83,11 @@ class Twitch
 	  if redeemed == $reward_title
 	   @socket.puts("PRIVMSG ##{$channel} :/w #{user} #{$room_code}")
 	   puts "#{true_user} has been sent a room code #{$room_code} for Jackbox."
+	  end
+	  if redeemed = "Pay Day"
+		amount = rand(15)+1
+		@socket.puts("PRIVMSG ##{$channel} :!bonusall #{amount}")
+		puts "All users have gained #{amount} Revlo points from Pay Day."
 	  end
 	 end
 	 match = line.match(/^:(.+)!.+ PRIVMSG .+ :!vikavolt.+$/)
