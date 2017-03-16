@@ -35,6 +35,7 @@ $reward_title = 'Jackbox Jumpbox'
 $username = 'user'
 $oauth = 'oauth:000000000000000000000000000000'
       # get OAuth key from https://twitchapps.com/tmi/
+$auth_users = ['elodicolo'] # keep all lowercase and separate by commas
 #===========================================================================================
 # END OF CONFIGURATION - EDIT BELOW ONLY IF YOU KNOW WHAT YOU ARE DOING
 #===========================================================================================
@@ -59,8 +60,9 @@ class Twitch
   @running = true
   puts 'Connected.'
   @socket.puts("PASS #{$oauth}")
-  @socket.puts("NICK #{$username}")
-  @socket.puts("JOIN ##{$channel}")
+  @socket.puts("NICK #{$username.downcase}")
+  @socket.puts("JOIN ##{$channel.downcase}")
+  @socket.puts("CAP REQ :twitch.tv/commands")
   puts ''
   puts "Logged in as #{$username} in ##{$channel}."
   puts ''
@@ -76,7 +78,9 @@ class Twitch
 	  user,value = $1.downcase, $2
 	  redeemed = $3[1..-4]
 	  $user_array.push(user) if redeemed == "Coupon"
+	  puts user+" claimed a coupon." if redeemed == "Coupon"
 	  if value.to_i > 0 && $user_array.include?(user)
+	   puts user+" has used their coupon on "+redeemed+" and has been refunded "+(value/2).to_s+" Revlo points."
 	   @socket.puts("PRIVMSG ##{$channel} :!bonus #{user} #{value / 2}")
 	   $user_array.delete(user)
 	  end
@@ -88,6 +92,16 @@ class Twitch
 		amount = rand(15)+1
 		@socket.puts("PRIVMSG ##{$channel} :!bonusall #{amount}")
 		puts "All users have gained #{amount} Revlo points from Pay Day."
+	  end
+	 end
+	 match = line.match(/^:(.+)!.+ WHISPER .+ :(.+)$/)
+	 if match
+	  puts "Received whisper from #{$1}: #{$2}"
+	  user = $1
+	  message = $2[0..-2]
+	  if $auth_users.include?(user) && message[0..2] == "set"
+	   $room_code = message[3..-1]
+	   puts "New room code: #{$room_code}"
 	  end
 	 end
 	 match = line.match(/^:(.+)!.+ PRIVMSG .+ :!vikavolt.+$/)
