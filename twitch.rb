@@ -73,7 +73,7 @@ class Twitch
      line = s.gets		
 	 match = line.match(/^:revlobot!.+ PRIVMSG .+ :(.+) spent ([0-9]+) points to redeem (.+)$/)
 	 if match
-	  user,value = $1, $2
+	  user,value = $1.downcase, $2
 	  redeemed = $3[1..-4]
 	  $user_array.push(user) if redeemed == "Coupon"
 	  if value.to_i > 0 && $user_array.include?(user)
@@ -82,7 +82,7 @@ class Twitch
 	  end
 	  if redeemed == $reward_title
 	   @socket.puts("PRIVMSG ##{$channel} :/w #{user} #{$room_code}")
-	   puts "#{true_user} has been sent a room code #{$room_code} for Jackbox."
+	   puts "#{user} has been sent a room code #{$room_code} for Jackbox."
 	  end
 	  if redeemed = "Pay Day"
 		amount = rand(15)+1
