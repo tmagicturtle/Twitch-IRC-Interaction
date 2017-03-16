@@ -84,7 +84,7 @@ class Twitch
 	   @socket.puts("PRIVMSG ##{$channel} :/w #{user} #{$room_code}")
 	   puts "#{user} has been sent a room code #{$room_code} for Jackbox."
 	  end
-	  if redeemed = "Pay Day"
+	  if redeemed == "Pay Day"
 		amount = rand(15)+1
 		@socket.puts("PRIVMSG ##{$channel} :!bonusall #{amount}")
 		puts "All users have gained #{amount} Revlo points from Pay Day."
